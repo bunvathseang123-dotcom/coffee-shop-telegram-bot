@@ -1,37 +1,31 @@
-# ----------------------------------------------------------------------
-# Stage 1: Build the WAR
-# ----------------------------------------------------------------------
-# Use 'gradle' user if available in this image for proper permissions
-FROM gradle:8.7-jdk21-alpine AS builder 
-
-# Set the working directory
+# STAGE 1: Build the application using a full JDK/Gradle image
+FROM eclipse-temurin:21-jdk-jammy AS build
 WORKDIR /app
-
-# Copy the wrapper files, build files, and apply permissions
+# Copy the project files
 COPY gradlew .
-COPY gradle/ gradle/
-RUN chmod +x gradlew  <-- FIX 1: Make the wrapper executable
+COPY gradle .
+COPY build.gradle .
+COPY settings.gradle .
+COPY src ./src
 
-# Copy the rest of the source code (assuming 'gradle' is the user)
-# If the user is 'gradle', add '--chown' to ensure proper ownership.
-# You may need to check the exact user name for this base image.
-COPY --chown=gradle:gradle . .
+# Build the executable JAR
+RUN ./gradlew bootJar --no-daemon
 
-# Run the build command
-RUN ./gradlew clean build -x test  <-- Use ./gradlew instead of just gradlew
+# STAGE 2: Create the final, lean runtime image (JRE only)
+# Use JRE for smaller image size and better security
+FROM eclipse-temurin:21-jre-jammy
 
-# ----------------------------------------------------------------------
-# Stage 2: Run the WAR
-# ----------------------------------------------------------------------
-FROM eclipse-temurin:21-jdk-alpine
+# Set a low-privilege user
+RUN useradd -u 1000 -ms /bin/bash spring
+USER spring
+
 WORKDIR /app
+
+# Copy only the built JAR file from the build stage
+COPY --from=build /app/build/libs/*.jar app.jar
+
+# Expose the default Spring Boot port (Render will override this, but it's good practice)
 EXPOSE 8080
 
-# Note: Your COPY path in the final stage needs a slight correction
-# It should typically point to 'build/libs' from the build stage.
-# The `*.war` syntax is correct.
-COPY --from=builder /app/build/libs/*.war app.war 
-
-# Run the Spring Boot application
-# Note: You can simplify the CMD if you don't need the PORT variable
-CMD ["java", "-Dserver.port=8080", "-jar", "app.war"]
+# Run the application
+ENTRYPOINT ["java", "-jar", "app.jar"]
