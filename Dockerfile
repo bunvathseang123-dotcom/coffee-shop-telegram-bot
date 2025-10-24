@@ -4,13 +4,15 @@
 FROM eclipse-temurin:21-jdk-jammy AS build
 WORKDIR /app
 
-# 1. Copy Gradle wrapper and configuration files (Infrequently Changed)
+# 1. Copy Gradle wrapper and configuration files
 COPY gradlew .
-COPY gradle/ .gradle/
+# Copy the wrapper files, INCLUDING the essential JAR file
+COPY gradle/wrapper/gradle-wrapper.jar gradle/wrapper/
+COPY gradle/wrapper/gradle-wrapper.properties gradle/wrapper/
 COPY build.gradle .
 COPY settings.gradle .
 
-# 2. Grant execute permission (The fix for your previous error)
+# 2. Grant execute permission
 RUN chmod +x ./gradlew
 
 # 3. Download/Cache Dependencies (Only runs if build.gradle changes)
