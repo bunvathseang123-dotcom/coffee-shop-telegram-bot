@@ -1,6 +1,8 @@
 # --- Stage 1: Build the JAR file ---
-FROM gradle:8.6-jdk21 AS build  # 👈 CHANGED to Java 21
+# CHANGED to use Java 21 build image
+FROM gradle:8.6-jdk21 AS build
 WORKDIR /app
+# ... rest of your Dockerfile instructions ...
 # Copy the Gradle wrapper files and source code
 COPY gradlew .
 RUN chmod +x gradlew # Fix for the previous 'Permission Denied' issue
