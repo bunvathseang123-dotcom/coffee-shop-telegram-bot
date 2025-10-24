@@ -1,11 +1,9 @@
 # --- Stage 1: Build the JAR file ---
-FROM gradle:7.6.0-jdk17 AS build
+FROM gradle:8.6-jdk21 AS build  # 👈 CHANGED to Java 21
 WORKDIR /app
 # Copy the Gradle wrapper files and source code
 COPY gradlew .
-# --- FIX: Add execute permission ---
-RUN chmod +x gradlew
-# --- End FIX ---
+RUN chmod +x gradlew # Fix for the previous 'Permission Denied' issue
 COPY gradle gradle
 COPY build.gradle .
 COPY settings.gradle .
@@ -14,8 +12,12 @@ COPY src src
 RUN ./gradlew bootJar --no-daemon
 
 # --- Stage 2: Create the final runtime image ---
-FROM eclipse-temurin:17-jre-alpine
+# Use a lightweight JRE (Java Runtime Environment) for production
+FROM eclipse-temurin:21-jre-alpine # 👈 CHANGED to Java 21
 WORKDIR /app
+# Copy the JAR from the build stage
 COPY --from=build /app/build/libs/*.jar app.jar
+# Expose the default Spring Boot port
 EXPOSE 8080
+# Set the entry point to run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
