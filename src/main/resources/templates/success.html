@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:sec="http://www.thymeleaf.org">
+
+<head th:replace="~{base::head}" />   
+
+<body>
+    <!-- Navbar Start -->
+	<div th:replace="~{base::navbar}"></div>
+    <!-- Navbar End -->
+
+
+    <!-- Page Header Start -->
+    <div th:replace="~{base::header(text='Success')}"></div>
+    <!-- Page Header End -->
+
+
+    <!-- SuccessStart -->
+    <div class="section-title text-center">
+    	<h3 class="mb-4">Booking Successful 🎉</h3>
+    	<p class="text-muted">Here are your reservation details</p>
+	</div>
+
+	<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow-lg border-0 rounded-3">
+            <div class="card-body p-4">
+                <table class="table table-borderless">
+                    <tbody>
+                        <tr>
+                            <th scope="row">Name:</th>
+                            <td th:text="${booked.name}"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Phone Number:</th>
+                            <td th:text="${booked.phoneNumber}"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Email:</th>
+                            <td th:text="${booked.email}"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Date:</th>
+                            <td th:text="${booked.date}"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Time:</th>
+                            <td th:text="${booked.time}"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Guests:</th>
+                            <td th:text="${booked.person}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="text-center mt-4">
+                    <a href="/" class="btn btn-primary">Back to Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+	</div>
+    <!-- Success End -->
+
+
+    <!-- Footer Start -->
+	<div th:replace="~{base::footer}"></div>
+    <!-- Footer End -->
+
+
+    <!-- Back to Top -->
+    <div th:replace="~{base::script}" /> 
+    
+</body>
+
+</html>
